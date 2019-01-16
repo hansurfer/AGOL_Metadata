@@ -59,6 +59,27 @@ def parentTagFuc(childTag):
     return "/".join(templist)
 
 
+def parentTag(Tag):
+    """
+    Return parent and child tag
+
+    Parameters
+    ----------
+    tag: str
+        tag string
+    Returns
+    -------
+    tuple
+        return parent and child tag
+    """
+    """Get parent tag"""
+    templist = Tag.split("/")
+    ctag = templist[-1]
+    del templist[-1:]
+    ptag = "/".join(templist)
+    return ptag, ctag
+
+
 def findaddmissingxmltagNoPrint(input_element):
     """
     Check input element (xml tag) exist in xml file.
@@ -152,6 +173,21 @@ def deletexmlTag2NoPrint(childTag):
         #loop Element and remove child elements
         for child in childElem:
             elem.remove(child)
+
+
+def deleteElem(tag):
+    """
+    Delete tag
+    """
+    #get parent tag
+    pTag, cTag = parentTag(tag)
+    #find parent tag - Element object
+    pElem = tree.find(pTag)
+    #if parent tag element exists
+    if pElem is not None:
+        cElem = pElem.find(cTag)
+        if cElem is not None:
+            pElem.remove(cElem)
 
 
 def inputChoice(qprompt):
@@ -324,6 +360,12 @@ for counter, xmlfile in enumerate(xmlpathlist):
             pubDateElement = tree.find(metaTag["pubDate"])
 
         pubDateElement.text = pubDate
+
+        # delete revised and created date
+        if revDateElement is not None:
+            deleteElem(metaTag["revisedate"])
+        if creDateElement is not None:
+            deleteElem(metaTag["createdate"])
 
         tree.write(xmlfile)
 
